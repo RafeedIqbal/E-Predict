@@ -19,7 +19,7 @@ Flask==3.1.0
 flask-cors==5.0.1
 Flask-JWT-Extended==4.7.1
 flatbuffers==25.2.10
-fonttools==4.56.0
+fonttools==4.60.2
 gast==0.6.0
 google-pasta==0.2.0
 grpcio==1.71.0

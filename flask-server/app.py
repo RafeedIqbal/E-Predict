@@ -8,6 +8,7 @@ from dataset_loader import IESODataset, ClimateDataset  # Updated import for new
 import datetime
 import pandas as pd
 import io, base64
+import os
 import matplotlib.pyplot as plt
 # Import the modified anomaly detection module
 from anomaly_detection import AnomalyDetection
@@ -17,7 +18,10 @@ import traceback # For detailed error logging
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-app.config['JWT_SECRET_KEY'] = 'your-secret-key'  # Replace with a secure key in production
+# Load JWT secret from environment variable for security
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'dev-secret-key-change-me')
+if app.config['JWT_SECRET_KEY'] == 'dev-secret-key-change-me':
+    print("WARNING: Using default JWT secret key. Set JWT_SECRET_KEY environment variable in production!")
 jwt = JWTManager(app)
 
 @app.route('/')

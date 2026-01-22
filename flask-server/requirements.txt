@@ -97,3 +97,7 @@ wheel==0.45.1
 wrapt==1.17.2
 xgboost==2.1.4
 yarg==0.1.10
+meteostat==1.6.8
+geopy==2.4.1
+geopandas==0.14.3
+shapely==2.0.3

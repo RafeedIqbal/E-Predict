@@ -1,9 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { Container, Paper, TextField, Button, Typography, Box } from "@mui/material";
+import {
+  Container,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Alert,
+  Divider,
+} from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -11,61 +21,109 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleRegister = async () => {
     setError("");
     setSuccess("");
 
+    if (!username || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      // Update the URL as needed to point to your Flask API endpoint.
-      const response = await axios.post("http://localhost:5000/register", {
+      await axios.post("http://localhost:5000/register", {
         username,
         password,
       });
-      setSuccess("Registration successful! Redirecting to login...");
-      // Redirect to login page after a short delay.
+      setSuccess("Account created successfully! Redirecting to login...");
       setTimeout(() => {
         router.push("/login");
       }, 2000);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      setError("Registration failed. Please try again.");
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      setError(axiosError.response?.data?.message || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleNavigateToLogin = () => {
-    router.push("/login");
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleRegister();
+    }
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        minHeight="100vh"
-        sx={{ padding: 2 }}
-      >
-        <Paper elevation={4} sx={{ padding: 4, width: "100%" }}>
-          <Typography variant="h4" component="h1" gutterBottom align="center">
-            Register
-          </Typography>
+    <Box
+      sx={{
+        minHeight: "calc(100vh - 64px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        py: 4,
+      }}
+    >
+      <Container maxWidth="xs">
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4,
+            backgroundColor: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.1)",
+          }}
+        >
+          <Box sx={{ textAlign: "center", mb: 4 }}>
+            <Box
+              sx={{
+                width: 56,
+                height: 56,
+                borderRadius: "50%",
+                backgroundColor: "secondary.main",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mx: "auto",
+                mb: 2,
+              }}
+            >
+              <PersonAddOutlinedIcon sx={{ fontSize: 28 }} />
+            </Box>
+            <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
+              Create Account
+            </Typography>
+            <Typography variant="body2" sx={{ color: "grey.400", mt: 1 }}>
+              Get started with E-Predict
+            </Typography>
+          </Box>
+
           {error && (
-            <Typography variant="body1" color="error" align="center">
+            <Alert severity="error" sx={{ mb: 3 }}>
               {error}
-            </Typography>
+            </Alert>
           )}
+
           {success && (
-            <Typography variant="body1" color="primary" align="center">
+            <Alert severity="success" sx={{ mb: 3 }}>
               {success}
-            </Typography>
+            </Alert>
           )}
+
           <Box component="form" noValidate autoComplete="off">
             <TextField
               label="Username"
@@ -74,6 +132,8 @@ const Register: React.FC = () => {
               fullWidth
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={loading || !!success}
             />
             <TextField
               label="Password"
@@ -83,6 +143,9 @@ const Register: React.FC = () => {
               fullWidth
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={loading || !!success}
+              helperText="Minimum 6 characters"
             />
             <TextField
               label="Confirm Password"
@@ -92,29 +155,46 @@ const Register: React.FC = () => {
               fullWidth
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={loading || !!success}
             />
             <Button
               variant="contained"
-              color="primary"
+              color="secondary"
               onClick={handleRegister}
               fullWidth
-              sx={{ mt: 3 }}
+              size="large"
+              disabled={loading || !!success}
+              sx={{ mt: 3, mb: 2 }}
             >
-              Register
+              {loading ? "Creating Account..." : "Create Account"}
             </Button>
+
+            <Divider sx={{ my: 3 }}>
+              <Typography variant="body2" sx={{ color: "grey.500" }}>
+                OR
+              </Typography>
+            </Divider>
+
             <Button
               variant="outlined"
-              color="secondary"
-              onClick={handleNavigateToLogin}
+              color="inherit"
+              onClick={() => router.push("/login")}
               fullWidth
-              sx={{ mt: 2 }}
+              sx={{
+                borderColor: "rgba(255,255,255,0.2)",
+                "&:hover": {
+                  borderColor: "rgba(255,255,255,0.4)",
+                  backgroundColor: "rgba(255,255,255,0.05)",
+                },
+              }}
             >
-              Back to Login
+              Already have an account? Sign In
             </Button>
           </Box>
         </Paper>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 };
 

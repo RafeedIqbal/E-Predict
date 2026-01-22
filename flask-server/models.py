@@ -55,7 +55,7 @@ def XGB_MT1R1(df):
 
 
     # --- Model Training (Same as before) ---
-    model = xgb.XGBRegressor(n_estimators=1000, eval_metric="rmse", use_label_encoder=False)
+    model = xgb.XGBRegressor(n_estimators=1000, eval_metric="rmse")
     model.fit(
         X_train, y_train,
         eval_set=[(X_train, y_train), (X_test, y_test)],

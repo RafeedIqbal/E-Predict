@@ -13,10 +13,16 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Stepper,
+  Step,
+  StepLabel,
+  Alert,
+  Chip,
 } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { CsvContext } from "@/context/CsvContext";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 // Options for zonal dataset
 const zonalOptions = [
@@ -33,36 +39,31 @@ const zonalOptions = [
   "Zone Total",
 ];
 
-// Options for FSA dataset (loaded from message.txt)
-const fsaOptions = ['Toronto', 'Ottawa', 'Hamilton', 'Mississauga', 'Brampton', 'Kitchener', 'London', 'Markham', 'Oshawa', 'Vaughan', 'Windsor', 'St. Catharines', 'Oakville', 'Richmond Hill', 'Burlington', 'Sudbury', 'Barrie', 'Guelph', 'Whitby', 'Cambridge', 'Milton', 'Ajax', 'Waterloo', 'Thunder Bay', 'Brantford', 'Chatham', 'Clarington', 'Pickering', 'Niagara Falls', 'Newmarket', 'Peterborough', 'Kawartha Lakes', 'Caledon', 'Belleville', 'Sarnia', 'Sault Ste. Marie', 'Welland', 'Halton Hills', 'Aurora', 'North Bay', 'Stouffville', 'Cornwall', 'Georgina', 'Woodstock', 'Quinte West', 'St. Thomas', 'New Tecumseth', 'Innisfil', 'Bradford West Gwillimbury', 'Timmins', 'Lakeshore', 'Brant', 'Leamington', 'East Gwillimbury', 'Orangeville', 'Orillia', 'Stratford', 'Fort Erie', 'LaSalle', 'Centre Wellington', 'Grimsby', 'King', 'Woolwich', 'Clarence-Rockland', 'Midland', 'Lincoln', 'Wasaga Beach', 'Collingwood', 'Strathroy-Caradoc', 'Thorold', 'Amherstburg', 'Tecumseh', 'Essa', 'Owen Sound', 'Brockville', 'Kingsville', 'Springwater', 'Scugog', 'Uxbridge', 'Wilmot', 'Essex', 'Oro-Medonte', 'Cobourg', 'South Frontenac', 'Port Colborne', 'Huntsville', 'Russell', 'Niagara-on-the-Lake', 'Middlesex Centre', 'Selwyn', 'Tillsonburg', 'Pelham', 'Petawawa', 'North Grenville', 'Loyalist', 'Port Hope', 'Pembroke', 'Bracebridge', 'Greater Napanee', 'Kenora', 'Mississippi Mills', 'St. Clair', 'West Lincoln', 'West Nipissing / Nipissing Ouest', 'Clearview', 'Thames Centre', 'Carleton Place', 'Guelph/Eramosa', 'Central Elgin', 'Saugeen Shores', 'Ingersoll', 'South Stormont', 'Severn', 'South Glengarry', 'North Perth', 'Trent Hills', 'The Nation / La Nation', 'West Grey', 'Gravenhurst', 'Perth East', 'Wellington North', 'Brighton', 'Tiny', 'Hawkesbury', 'Brock', 'Erin', 'Kincardine', 'Elliot Lake', 'Arnprior', 'North Dundas', 'Wellesley', 'Georgian Bluffs', 'Norwich', 'Meaford', 'Adjala-Tosorontio', 'Hamilton Township', 'South Dundas', 'Lambton Shores', 'North Dumfries', 'Mapleton', 'Rideau Lakes', 'North Glengarry', 'South Huron', 'Penetanguishene', 'Tay', 'Cavan Monaghan', 'Temiskaming Shores', 'Grey Highlands', 'Alfred and Plantagenet', 'Elizabethtown-Kitley', 'Smiths Falls', 'Ramara', 'Leeds and the Thousand Islands', 'Brockton', 'Laurentian Valley', 'Mono', 'Malahide', 'Huron East', 'Beckwith', 'Shelburne', 'West Perth', 'Champlain', 'Minto', 'South Bruce Peninsula', 'Renfrew', 'Plympton-Wyoming', 'Kapuskasing', 'Zorra', 'Kirkland Lake', 'Aylmer', 'Puslinch', 'Drummond/North Elmsley', 'Hanover', 'Dryden', 'Fort Frances', 'Goderich', 'Stone Mills', 'South-West Oxford', 'Douro-Dummer', 'McNab/Braeside', 'Central Huron', 'Blandford-Blenheim', 'Bayham', 'Augusta', 'St. Marys', 'Southgate', 'Bluewater', 'East Zorra-Tavistock', 'Otonabee-South Monaghan', 'Huron-Kinloss', 'The Blue Mountains', 'Whitewater Region', 'Edwardsburgh/Cardinal', 'Wainfleet', 'North Stormont', 'Alnwick/Haldimand', 'Arran-Elderslie', 'Parry Sound', 'Muskoka Falls', 'Perth', 'Cramahe', 'North Middlesex', 'Dysart et al', 'Hindon Hill', 'Tweed', 'Oliver Paipoonge', 'Petrolia', 'Southwest Middlesex', 'Front of Yonge', 'Tay Valley', 'South Bruce', 'Ashfield-Colborne-Wawanosh', 'Trent Lakes', 'Gananoque', 'Lanark Highlands', 'Cochrane', 'Sioux Lookout', 'Hearst', 'Breslau', 'Stirling-Rawdon', 'Espanola', 'West Elgin', 'East Ferris', 'North Huron', 'Southwold', 'Centre Hastings', 'Lucan Biddulph', 'Greenstone', 'Tyendinaga', 'Iroquois Falls', 'Havelock-Belmont-Methuen', 'Central Frontenac', 'Seguin', 'Madawaska Valley', 'Deep River', 'Asphodel-Norwood', 'Red Lake', 'Hastings Highlands', 'Prescott', 'Northern Bruce Peninsula', 'Casselman', 'Callander', 'Amaranth', 'Marmora and Lake', 'Bancroft', 'Howick', 'Dutton/Dunwich', 'Perth South', 'Montague', 'Warwick', 'Bonnechere Valley', 'Morris-Turnberry', 'Mulmur', 'Blind River', 'Powassan', 'Highlands East', 'East Hawkesbury', 'Marathon', 'Shuniah', 'Sables-Spanish Rivers', 'Lake of Bays', 'Merrickville', 'Adelaide-Metcalfe', 'Melancthon', 'Laurentian Hills', 'Grand Valley', 'Admaston/Bromley', 'North Algona Wilberforce', 'Wawa', 'Horton', 'Enniskillen', 'Atikokan', 'Markstay', 'Northeastern Manitoulin and the Islands', 'McDougall', 'French River / Rivière des Français', 'East Garafraxa', 'Greater Madawaska', 'Georgian Bay', 'North Kawartha', 'Perry', 'Black River-Matheson', 'Killaloe, Hagarty and Richards', 'Alvinston', 'Algonquin Highlands', 'Addington Highlands', 'Neebing', 'Bonfield', 'Central Manitoulin', 'Madoc', 'Mattawa', 'Dawn-Euphemia', 'Chapleau', 'Manitouwadge', 'Wellington', 'Frontenac Islands', 'Point Edward', 'North Frontenac', 'Komoka', 'Deseronto', 'Nipissing', 'Huron Shores', 'Nipigon', 'Burford', 'Terrace Bay', 'Macdonald, Meredith and Aberdeen Additional', 'Brudenell, Lyndoch and Raglan', 'Moosonee', 'Englehart', 'Strong', 'Lappe', 'Armour', 'Faraday', 'Bayfield', 'St.-Charles', 'Emo', 'Smooth Rock Falls', 'Chisholm', 'Thessalon', 'Conestogo', 'St. Joseph', 'Moonbeam', 'Claremont', 'Ignace', 'Armstrong', 'Hillsburgh', 'Sagamok', 'Hensall', 'Carling', 'Laird', 'Tara', 'Cobalt', 'South River', 'McKellar', 'South Algonquin', 'Sioux Narrows-Nestor Falls', 'Beachburg', 'Schreiber', 'Plantagenet', 'Papineau-Cameron', 'Assiginack', 'Prince', 'Athens', 'Chatsworth', 'Magnetawan'];
+// Options for FSA dataset
+const fsaOptions = ['Toronto', 'Ottawa', 'Hamilton', 'Mississauga', 'Brampton', 'Kitchener', 'London', 'Markham', 'Oshawa', 'Vaughan', 'Windsor', 'St. Catharines', 'Oakville', 'Richmond Hill', 'Burlington', 'Sudbury', 'Barrie', 'Guelph', 'Whitby', 'Cambridge', 'Milton', 'Ajax', 'Waterloo', 'Thunder Bay', 'Brantford', 'Chatham', 'Clarington', 'Pickering', 'Niagara Falls', 'Newmarket', 'Peterborough', 'Kawartha Lakes', 'Caledon', 'Belleville', 'Sarnia', 'Sault Ste. Marie', 'Welland', 'Halton Hills', 'Aurora', 'North Bay'];
+
+const steps = ["Configure Dataset", "Generate Data", "Proceed to Analysis"];
 
 const CreateDatasetPage: React.FC = () => {
-  // Now also destructure csvData to access the generated CSV content.
   const { csvData, setCsvData } = useContext(CsvContext);
   const router = useRouter();
 
   // Form state
-  const [datasetType, setDatasetType] = useState<string>("FSA");
-  const [repository, setRepository] = useState<string>("climate");
-  const [target, setTarget] = useState<string>(
-    "FSA" === "FSA" ? fsaOptions[0] : zonalOptions[0]
-  );
-  // Date fields for FSA (month inputs) and Zonal (year inputs)
+  const [datasetType, setDatasetType] = useState<string>("Zonal");
+  const [target, setTarget] = useState<string>(zonalOptions[0]);
   const [startMonthFSA, setStartMonthFSA] = useState<string>("2018-01");
   const [endMonthFSA, setEndMonthFSA] = useState<string>("2024-12");
-  const [startYearZonal, setStartYearZonal] = useState<string>("2003");
+  const [startYearZonal, setStartYearZonal] = useState<string>("2018");
   const [endYearZonal, setEndYearZonal] = useState<string>("2024");
 
   // UI state
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
+  const [activeStep, setActiveStep] = useState(0);
 
-  // When datasetType changes, reset the target field to the first available option.
-  const handleDatasetTypeChange = (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
-    const newType = event.target.value as string;
+  const handleDatasetTypeChange = (event: { target: { value: string } }) => {
+    const newType = event.target.value;
     setDatasetType(newType);
     if (newType === "FSA") {
       setTarget(fsaOptions[0]);
@@ -75,15 +76,15 @@ const CreateDatasetPage: React.FC = () => {
     setError("");
     setSuccess("");
     setLoading(true);
+    setActiveStep(1);
+
     try {
-      // Always send dataset_type in lower-case
-      let postData: any = {
+      let postData: Record<string, string | number> = {
         dataset_type: datasetType.toLowerCase(),
-        predictor_repo: repository,
+        predictor_repo: "climate",
       };
 
       if (datasetType === "FSA") {
-        // For FSA, split the month fields into year and month
         const [sYear, sMonth] = startMonthFSA.split("-");
         const [eYear, eMonth] = endMonthFSA.split("-");
         postData = {
@@ -95,7 +96,6 @@ const CreateDatasetPage: React.FC = () => {
           end_month: parseInt(eMonth),
         };
       } else {
-        // For Zonal, use year inputs
         postData = {
           ...postData,
           target_zone: target,
@@ -107,14 +107,17 @@ const CreateDatasetPage: React.FC = () => {
       const response = await axios.post(
         "http://localhost:5000/generate_csv",
         postData,
-        { responseType: "text" } // Expect CSV text
+        { responseType: "text" }
       );
-      // Save the generated CSV in context under "original"
+
       setCsvData({ original: response.data, target });
-      setSuccess("CSV generated and stored successfully.");
+      setSuccess("Dataset generated successfully!");
+      setActiveStep(2);
     } catch (err: unknown) {
       console.error(err);
-      setError("Failed to generate CSV. Please check your inputs and try again.");
+      const errorMsg = err instanceof Error ? err.message : "Failed to generate dataset. Please try again.";
+      setError(errorMsg);
+      setActiveStep(0);
     } finally {
       setLoading(false);
     }
@@ -124,202 +127,227 @@ const CreateDatasetPage: React.FC = () => {
     router.push("/dataset/analysis");
   };
 
-  // New function to download the CSV
   const handleDownloadCSV = () => {
     if (!csvData?.original) return;
     const blob = new Blob([csvData.original], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "generated.csv");
+    link.setAttribute("download", `${target.replace(/\s+/g, "_")}_dataset.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 4,
-          p: 2,
-        }}
-      >
-        <Paper elevation={4} sx={{ p: 4, width: "100%" }}>
-          <Typography variant="h4" component="h1" gutterBottom align="center">
-            Create Dataset
+    <Box sx={{ minHeight: "calc(100vh - 64px)", py: 4 }}>
+      <Container maxWidth="md">
+        {/* Progress Stepper */}
+        <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4,
+            backgroundColor: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.1)",
+          }}
+        >
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
+            Configure Dataset
           </Typography>
+          <Typography variant="body1" sx={{ color: "grey.400", mb: 4 }}>
+            Select your data source and parameters to generate a merged energy and climate dataset.
+          </Typography>
+
           {error && (
-            <Typography variant="body1" color="error" align="center">
+            <Alert severity="error" sx={{ mb: 3 }}>
               {error}
-            </Typography>
+            </Alert>
           )}
+
           {success && (
-            <Typography variant="body1" color="primary" align="center">
+            <Alert
+              severity="success"
+              icon={<CheckCircleIcon />}
+              sx={{ mb: 3 }}
+            >
               {success}
-            </Typography>
+            </Alert>
           )}
+
           <Box
             component="form"
             noValidate
             autoComplete="off"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              mt: 2,
-            }}
+            sx={{ display: "flex", flexDirection: "column", gap: 3 }}
           >
-            {/* 1. Dataset Type */}
+            {/* Dataset Type */}
             <FormControl fullWidth>
-              <InputLabel id="dataset-type-label">Type</InputLabel>
+              <InputLabel id="dataset-type-label">Dataset Type</InputLabel>
               <Select
                 labelId="dataset-type-label"
                 value={datasetType}
-                label="Type"
+                label="Dataset Type"
                 onChange={handleDatasetTypeChange}
+                disabled={loading || !!success}
               >
-                <MenuItem value="FSA">FSA</MenuItem>
-                <MenuItem value="Zonal">Zonal</MenuItem>
+                <MenuItem value="Zonal">Zonal (Ontario Zones)</MenuItem>
+                <MenuItem value="FSA">FSA (Forward Sortation Area / City)</MenuItem>
               </Select>
             </FormControl>
 
-            {/* 2. Repository */}
-            <TextField
-              label="Repository"
-              variant="outlined"
-              fullWidth
-              value={repository}
-              onChange={(e) => setRepository(e.target.value)}
-              helperText="Default: climate"
-              InputProps={{ sx: { backgroundColor: "white" } }}
-            />
+            {/* Target Selection */}
+            <FormControl fullWidth>
+              <InputLabel id="target-label">
+                {datasetType === "FSA" ? "City" : "Zone"}
+              </InputLabel>
+              <Select
+                labelId="target-label"
+                value={target}
+                label={datasetType === "FSA" ? "City" : "Zone"}
+                onChange={(e) => setTarget(e.target.value as string)}
+                disabled={loading || !!success}
+              >
+                {(datasetType === "FSA" ? fsaOptions : zonalOptions).map((opt) => (
+                  <MenuItem key={opt} value={opt}>
+                    {opt}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-            {/* 3. Target: City for FSA or Zone for Zonal */}
-            {datasetType === "FSA" ? (
-              <FormControl fullWidth>
-                <InputLabel id="fsa-city-label">City</InputLabel>
-                <Select
-                  labelId="fsa-city-label"
-                  value={target}
-                  label="City"
-                  onChange={(e) => setTarget(e.target.value as string)}
-                >
-                  {fsaOptions.map((city) => (
-                    <MenuItem key={city} value={city}>
-                      {city}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            ) : (
-              <FormControl fullWidth>
-                <InputLabel id="zonal-zone-label">Zone</InputLabel>
-                <Select
-                  labelId="zonal-zone-label"
-                  value={target}
-                  label="Zone"
-                  onChange={(e) => setTarget(e.target.value as string)}
-                >
-                  {zonalOptions.map((zone) => (
-                    <MenuItem key={zone} value={zone}>
-                      {zone}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-
-            {/* 4. Date Range Fields */}
-            {datasetType === "FSA" ? (
-              <>
-                <TextField
-                  label="Start Year/Month"
-                  type="month"
-                  fullWidth
-                  value={startMonthFSA}
-                  onChange={(e) => setStartMonthFSA(e.target.value)}
-                  InputProps={{ inputProps: { min: "2018-01", max: "2024-12" } }}
-                />
-                <TextField
-                  label="End Year/Month"
-                  type="month"
-                  fullWidth
-                  value={endMonthFSA}
-                  onChange={(e) => setEndMonthFSA(e.target.value)}
-                  InputProps={{ inputProps: { min: "2018-01", max: "2024-12" } }}
-                />
-              </>
-            ) : (
-              <>
-                <TextField
-                  label="Start Year"
-                  type="number"
-                  fullWidth
-                  value={startYearZonal}
-                  onChange={(e) => setStartYearZonal(e.target.value)}
-                  InputProps={{ inputProps: { min: 2003, max: 2024 } }}
-                />
-                <TextField
-                  label="End Year"
-                  type="number"
-                  fullWidth
-                  value={endYearZonal}
-                  onChange={(e) => setEndYearZonal(e.target.value)}
-                  InputProps={{ inputProps: { min: 2003, max: 2024 } }}
-                />
-              </>
-            )}
-
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleGenerateCSV}
-              disabled={loading}
-              fullWidth
-              sx={{ mt: 2 }}
-            >
-              {loading ? (
-                <CircularProgress size={24} color="inherit" />
+            {/* Date Range */}
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              {datasetType === "FSA" ? (
+                <>
+                  <TextField
+                    label="Start Month"
+                    type="month"
+                    fullWidth
+                    value={startMonthFSA}
+                    onChange={(e) => setStartMonthFSA(e.target.value)}
+                    disabled={loading || !!success}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                  <TextField
+                    label="End Month"
+                    type="month"
+                    fullWidth
+                    value={endMonthFSA}
+                    onChange={(e) => setEndMonthFSA(e.target.value)}
+                    disabled={loading || !!success}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </>
               ) : (
-                "Generate CSV"
+                <>
+                  <TextField
+                    label="Start Year"
+                    type="number"
+                    fullWidth
+                    value={startYearZonal}
+                    onChange={(e) => setStartYearZonal(e.target.value)}
+                    disabled={loading || !!success}
+                    InputProps={{ inputProps: { min: 2003, max: 2024 } }}
+                  />
+                  <TextField
+                    label="End Year"
+                    type="number"
+                    fullWidth
+                    value={endYearZonal}
+                    onChange={(e) => setEndYearZonal(e.target.value)}
+                    disabled={loading || !!success}
+                    InputProps={{ inputProps: { min: 2003, max: 2024 } }}
+                  />
+                </>
               )}
-            </Button>
-          </Box>
+            </Box>
 
-          {success && (
-            <>
+            {/* Generate Button */}
+            {!success && (
               <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handleProceed}
+                variant="contained"
+                color="primary"
+                onClick={handleGenerateCSV}
+                disabled={loading}
                 fullWidth
+                size="large"
                 sx={{ mt: 2 }}
               >
-                Proceed
+                {loading ? (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <CircularProgress size={24} color="inherit" />
+                    Generating Dataset...
+                  </Box>
+                ) : (
+                  "Generate Dataset"
+                )}
               </Button>
-              {/* New Download CSV button */}
-              {csvData?.original && (
+            )}
+
+            {/* Success Actions */}
+            {success && (
+              <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
                 <Button
                   variant="contained"
                   color="primary"
+                  onClick={handleProceed}
+                  fullWidth
+                  size="large"
+                >
+                  Continue to Analysis →
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="inherit"
                   onClick={handleDownloadCSV}
                   fullWidth
-                  sx={{ mt: 2 }}
+                  size="large"
                 >
                   Download CSV
                 </Button>
-              )}
-            </>
+              </Box>
+            )}
+          </Box>
+
+          {/* Dataset Info */}
+          {success && csvData?.original && (
+            <Box sx={{ mt: 4, p: 3, backgroundColor: "rgba(16, 185, 129, 0.1)", borderRadius: 2 }}>
+              <Typography variant="subtitle2" sx={{ color: "secondary.main", mb: 1 }}>
+                Dataset Ready
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                <Chip label={`Target: ${target}`} size="small" />
+                <Chip label={`Type: ${datasetType}`} size="small" />
+                <Chip
+                  label={`Rows: ${csvData.original.split("\n").length - 1}`}
+                  size="small"
+                />
+              </Box>
+            </Box>
           )}
         </Paper>
-      </Box>
-    </Container>
+
+        {/* Back Button */}
+        <Box sx={{ textAlign: "center", mt: 4 }}>
+          <Button
+            variant="text"
+            color="inherit"
+            onClick={() => router.push("/dataset")}
+            sx={{ opacity: 0.6, "&:hover": { opacity: 1 } }}
+          >
+            ← Back to Dataset Options
+          </Button>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 

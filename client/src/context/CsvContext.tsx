@@ -4,20 +4,20 @@ import React, { createContext, useState, ReactNode } from "react";
 
 // Define the CSV data structure
 export interface CsvData {
-  original: string;
-  target: string;
+  original?: string;
+  target?: string;
   xgb?: string;
   lstm?: string;
 }
 
 interface CsvContextType {
   csvData: CsvData | null;
-  setCsvData: (data: CsvData | null) => void;
+  setCsvData: React.Dispatch<React.SetStateAction<CsvData | null>>;
 }
 
 export const CsvContext = createContext<CsvContextType>({
   csvData: null,
-  setCsvData: () => {},
+  setCsvData: () => { },
 });
 
 export const CsvProvider = ({ children }: { children: ReactNode }) => {

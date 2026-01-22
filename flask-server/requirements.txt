@@ -1,4 +1,4 @@
-Flask==3.1.1
+Flask==3.1.0
 flask-cors==6.0.0
 Flask-JWT-Extended==4.7.1
 requests==2.32.4
@@ -12,3 +12,7 @@ matplotlib==3.10.1
 beautifulsoup4==4.13.3
 tqdm==4.67.1
 prettytable==3.16.0
+meteostat==1.6.8
+geopy==2.4.1
+geopandas==1.0.1
+shapely==2.1.0

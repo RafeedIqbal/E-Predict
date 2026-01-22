@@ -60,7 +60,7 @@ platformdirs==4.3.6
 plotly==6.0.0
 prettytable==3.16.0
 prompt_toolkit==3.0.50
-protobuf==5.29.3
+protobuf==5.29.5
 psutil==7.0.0
 pure_eval==0.2.3
 Pygments==2.19.1

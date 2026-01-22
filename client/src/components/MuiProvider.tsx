@@ -3,6 +3,8 @@
 import React from "react";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+
 const theme = createTheme({
   palette: {
     mode: "dark",
@@ -103,9 +105,11 @@ interface MuiProviderProps {
 
 export default function MuiProvider({ children }: MuiProviderProps) {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      {children}
-    </ThemeProvider>
+    <AppRouterCacheProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
+      </ThemeProvider>
+    </AppRouterCacheProvider>
   );
 }

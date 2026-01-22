@@ -9,8 +9,8 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 # Use specific Keras imports if needed, otherwise just keras.api is fine
 # from tensorflow import keras # Or from keras.api import ... if using specific backend
-from keras.api.models import Sequential
-from keras.api.layers import LSTM, Dense
+from keras.models import Sequential
+from keras.layers import LSTM, Dense, Input
 import matplotlib
 matplotlib.use('Agg') # Use Agg backend for non-interactive plotting
 
@@ -216,7 +216,8 @@ def LSTM_FINAL(df, look_back=6):
     # --- Model Building & Training ---
     model = Sequential()
     # Consider adding more units or layers if needed, but 25 is often a starting point
-    model.add(LSTM(units=50, return_sequences=True, input_shape=(look_back, 1))) # Increased units slightly
+    model.add(Input(shape=(look_back, 1)))
+    model.add(LSTM(units=50, return_sequences=True)) # Increased units slightly
     model.add(LSTM(units=50))
     model.add(Dense(1))
     model.compile(loss='mean_squared_error', optimizer='adam')

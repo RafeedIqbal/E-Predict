@@ -16,9 +16,17 @@ From the project root directory:
 
 1. **Create and activate a virtual environment** (if you haven't already):
    ```bash
-   # Windows
+   # Windows (Command Prompt / CMD)
+   python -m venv .venv
+   .venv\Scripts\activate
+
+   # Windows (PowerShell)
    python -m venv .venv
    .\.venv\Scripts\activate
+
+   # Windows (Git Bash / MINGW64)
+   python -m venv .venv
+   source .venv/Scripts/activate
 
    # macOS/Linux
    python3 -m venv .venv

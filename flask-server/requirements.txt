@@ -14,5 +14,5 @@ tqdm==4.67.1
 prettytable==3.16.0
 meteostat==1.6.8
 geopy==2.4.1
-geopandas==1.0.1
+geopandas==1.1.2
 shapely==2.1.0
